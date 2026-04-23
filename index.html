@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Discovery | AI Prompt Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lottie -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mint: { 50: '#f0fdfa', 100: '#ccfbf1', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' },
+                        softOrange: { 50: '#fff7ed', 400: '#fb923c', 500: '#f97316' }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body {
+            background: linear-gradient(135deg, #f0fdfa 0%, #fff7ed 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 32px;
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.4);
+        }
+        .progress-fill {
+            transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.2); border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased text-slate-800 p-4 md:p-8">
+
+<div x-data="dietApp()" class="max-w-2xl mx-auto pt-6 pb-12" x-cloak>
+
+    <!-- Header & Progress Bar -->
+    <div class="mb-10 text-center">
+        <h1 class="text-2xl font-extrabold tracking-tight text-teal-900 mb-6">Diet Discovery ✨</h1>
+        <div class="w-full h-2.5 bg-white/30 rounded-full overflow-hidden border border-white/20 shadow-sm">
+            <div class="progress-fill h-full bg-gradient-to-r from-teal-400 to-softOrange-400" :style="'width: ' + progress + '%'"></div>
+        </div>
+        <div class="flex justify-between mt-2 text-[10px] font-bold uppercase tracking-widest text-teal-700/60 px-1">
+            <span :class="step >= 1 ? 'text-teal-600' : ''">Basics</span>
+            <span :class="step >= 2 ? 'text-teal-600' : ''">Routine</span>
+            <span :class="step >= 3 ? 'text-teal-600' : ''">Fuel</span>
+            <span :class="step >= 4 ? 'text-teal-600' : ''">Dream</span>
+        </div>
+    </div>
+
+    <!-- Phase 1: The Basics -->
+    <div x-show="step === 1" x-transition.opacity.duration.500ms class="glass p-8 shadow-2xl border border-white/40">
+        <div class="mb-6 text-center">
+            <span class="text-teal-600 font-bold text-sm uppercase tracking-widest">Phase 1</span>
+            <h2 class="text-3xl font-black text-slate-800 mt-1">The Basics 🧬</h2>
+            <p class="text-slate-500 italic mt-2 text-sm">Let's get the logistics out of the way!</p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Age</label>
+                    <input type="number" x-model="data.age" placeholder="e.g., 28" class="glass-input w-full p-4 rounded-2xl outline-none focus:ring-2 focus:ring-teal-400/50">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Sex</label>
+                    <select x-model="data.sex" class="glass-input w-full p-4 rounded-2xl outline-none appearance-none">
+                        <option value="">Select...</option>
+                        <option>Female 🚺</option>
+                        <option>Male 🚹</option>
+                        <option>Other 🌈</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Height (cm)</label>
+                    <input type="number" x-model="data.height" placeholder="e.g., 175" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Weight (kg)</label>
+                    <input type="number" x-model="data.weight" placeholder="e.g., 82" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Life Role / Job</label>
+                <input type="text" x-model="data.role" placeholder="e.g., Software Engineer, Homemaker" class="glass-input w-full p-4 rounded-2xl outline-none">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Medical Disclaimer 🩺</label>
+                <textarea x-model="data.medical" placeholder="Any conditions (Diabetes, PCOS), medications, or pregnancy status? e.g., 'Thyroid medication, 50mg daily.'" class="glass-input w-full p-4 rounded-2xl outline-none h-24 resize-none text-sm"></textarea>
+            </div>
+        </div>
+
+        <button @click="next()" class="btn-primary w-full mt-8 text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-lg">
+            Let's Go! 🚀
+        </button>
+    </div>
+
+    <!-- Phase 2: The Routine -->
+    <div x-show="step === 2" x-transition.opacity.duration.500ms class="glass p-8 shadow-2xl border border-white/40">
+        <div class="mb-6 text-center">
+            <span class="text-teal-600 font-bold text-sm uppercase tracking-widest">Phase 2</span>
+            <h2 class="text-3xl font-black text-slate-800 mt-1">Your Daily Vibe ⚡</h2>
+            <p class="text-slate-500 italic mt-2 text-sm">Sitting for 8 hours is like eating 2 extra chapatis! 🫓</p>
+        </div>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-3 text-center">Typical Energy Level</label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <template x-for="animal in animals" :key="animal.id">
+                        <button @click="data.energy = animal.id"
+                                :class="data.energy === animal.id ? 'ring-2 ring-teal-500 bg-white shadow-md' : 'bg-white/30 hover:bg-white/50'"
+                                class="p-3 rounded-2xl text-center transition-all border border-white/40">
+                            <span class="text-3xl block mb-1" x-text="animal.icon"></span>
+                            <span class="text-[10px] font-black uppercase text-slate-700" x-text="animal.name"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Exercise Days/Week</label>
+                    <select x-model="data.exerciseDays" class="glass-input w-full p-4 rounded-2xl outline-none appearance-none">
+                        <option value="">Select...</option>
+                        <option>0 days</option>
+                        <option>1-2 days</option>
+                        <option>3-4 days</option>
+                        <option>5-6 days</option>
+                        <option>7 days</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Workout Type & Duration</label>
+                    <input type="text" x-model="data.workout" placeholder="e.g., Walking, 30 mins" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Weekday vs Weekend Routine 📆</label>
+                <textarea x-model="data.routine" placeholder="e.g., 'Weekday: Desk job 9-6, late dinner 10pm. Weekend: Sleep late, eat out for brunch, active social life.'" class="glass-input w-full p-4 rounded-2xl outline-none h-28 resize-none text-sm"></textarea>
+            </div>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+            <button @click="prev()" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 transition-colors">Back</button>
+            <button @click="next()" class="btn-primary flex-[2] text-white font-bold py-4 rounded-2xl shadow-lg text-lg">
+                Tell Me More! 🥗
+            </button>
+        </div>
+    </div>
+
+    <!-- Phase 3: The Fuel -->
+    <div x-show="step === 3" x-transition.opacity.duration.500ms class="glass p-8 shadow-2xl border border-white/40">
+        <div class="mb-6 text-center">
+            <span class="text-teal-600 font-bold text-sm uppercase tracking-widest">Phase 3</span>
+            <h2 class="text-3xl font-black text-slate-800 mt-1">The Fuel 🍽️</h2>
+            <p class="text-slate-500 italic mt-2 text-sm">1 spoon of oil = 120 calories. That's a 20-min brisk walk! 🚶</p>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Food Persona</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <template x-for="type in dietTypes">
+                        <button @click="data.diet = type"
+                                :class="data.diet === type ? 'ring-2 ring-teal-500 bg-white' : 'bg-white/30'"
+                                class="p-3 rounded-xl text-[11px] font-bold transition-all border border-white/40 uppercase" x-text="type"></button>
+                    </template>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Fasting Frequency</label>
+                    <select x-model="data.fasting" class="glass-input w-full p-4 rounded-2xl outline-none appearance-none">
+                        <option value="">Select...</option>
+                        <option>Daily (16:8 etc)</option>
+                        <option>Weekly (Mondays etc)</option>
+                        <option>Monthly (Ekadashi)</option>
+                        <option>Occasionally</option>
+                        <option>I don't fast</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Meals & Snacks / Day</label>
+                    <input type="text" x-model="data.meals" placeholder="e.g., 3 meals, 2 snacks" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Water (Glasses)</label>
+                    <input type="number" x-model="data.water" placeholder="e.g., 8" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Tea/Coffee (Cups)</label>
+                    <input type="number" x-model="data.caffeine" placeholder="e.g., 2" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Supplements & Protein 💊</label>
+                <textarea x-model="data.supplements" placeholder="e.g., 'Whey protein, B12, Multivitamin. I try to eat paneer/eggs daily.'" class="glass-input w-full p-4 rounded-2xl outline-none h-20 resize-none text-sm"></textarea>
+            </div>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+            <button @click="prev()" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600">Back</button>
+            <button @click="next()" class="btn-primary flex-[2] text-white font-bold py-4 rounded-2xl shadow-lg text-lg">
+                Almost There! ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- Phase 4: Goals & Lifestyle -->
+    <div x-show="step === 4" x-transition.opacity.duration.500ms class="glass p-8 shadow-2xl border border-white/40">
+        <div class="mb-6 text-center">
+            <span class="text-teal-600 font-bold text-sm uppercase tracking-widest">Phase 4</span>
+            <h2 class="text-3xl font-black text-slate-800 mt-1">The Dream 💭</h2>
+            <p class="text-slate-500 italic mt-2 text-sm">Visualize the win. You're seconds away! 🏆</p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Target Weight & Date</label>
+                    <input type="text" x-model="data.target" placeholder="e.g., 70kg by Dec" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Grocery Budget 💰</label>
+                    <input type="text" x-model="data.budget" placeholder="e.g., Moderate / ₹5000pm" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Food Loves ❤️</label>
+                    <input type="text" x-model="data.loves" placeholder="e.g., Dosa, Biryani" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Food Hates 🚫</label>
+                    <input type="text" x-model="data.hates" placeholder="e.g., Karela, Papaya" class="glass-input w-full p-4 rounded-2xl outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Cooking Reality 👩‍🍳</label>
+                    <select x-model="data.cooking" class="glass-input w-full p-4 rounded-2xl outline-none appearance-none">
+                        <option value="">Cook at home?</option>
+                        <option>Mostly Home Cooked</option>
+                        <option>50/50 Home & Outside</option>
+                        <option>Mostly Outside/Takeout</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Motivation (1-10)</label>
+                    <input type="range" min="1" max="10" x-model="data.motivation" class="w-full h-2 bg-teal-200 rounded-lg appearance-none cursor-pointer accent-teal-600 mt-4">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1 ml-1">Non-Scale Victory & Roadblocks 🧠</label>
+                <textarea x-model="data.roadblocks" placeholder="e.g., 'I want to fit into my old jeans. My main roadblock is late-night stress snacking.'" class="glass-input w-full p-4 rounded-2xl outline-none h-24 resize-none text-sm"></textarea>
+            </div>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+            <button @click="prev()" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600">Back</button>
+            <button @click="finish()" class="btn-primary flex-[2] text-white font-bold py-4 rounded-2xl shadow-lg text-lg">
+                Build My Prompt! 🪄
+            </button>
+        </div>
+    </div>
+
+    <!-- Final Result Page -->
+    <div x-show="step === 5" x-transition.opacity.duration.500ms class="glass p-8 shadow-2xl border border-white/40 text-center relative overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none flex justify-center">
+            <lottie-player id="confetti" src="https://assets3.lottiefiles.com/packages/lf20_u4yrau.json" background="transparent" speed="1" style="width: 100%; height: 100%;"></lottie-player>
+        </div>
+
+        <div class="relative z-10">
+            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-3xl">🏆</span>
+            </div>
+            <h2 class="text-3xl font-black text-slate-800 mb-1">Success!</h2>
+            <p class="text-slate-500 mb-6 text-sm">Your custom AI instructions are ready.</p>
+
+            <!-- EASY STEPS BOX -->
+            <div class="bg-teal-50/80 rounded-2xl p-4 mb-6 text-left border border-teal-100">
+                <h3 class="text-xs font-black text-teal-800 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    What to do next:
+                </h3>
+                <ul class="space-y-3 text-xs text-teal-900/80 font-medium">
+                    <li class="flex gap-3">
+                        <span class="bg-teal-500 text-white w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</span>
+                        <span>Click the <b>Copy Button</b> below to save your data.</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="bg-teal-500 text-white w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</span>
+                        <span>Open <a href="https://gemini.google.com" target="_blank" class="text-teal-600 underline font-bold">Gemini</a> or <a href="https://claude.ai" target="_blank" class="text-teal-600 underline font-bold">Claude</a> and <b>Paste</b> the text.</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="bg-teal-500 text-white w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</span>
+                        <span>The AI will give you <b>Stage 1</b>. Simply type "<b>Continue</b>" to see the next stage!</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-900 rounded-3xl p-6 text-left relative group">
+                <div class="absolute top-4 right-4 flex gap-2">
+                    <button @click="copyPrompt()" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-xl transition-all border border-white/10">
+                        <template x-if="!copied">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                        </template>
+                        <template x-if="copied">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </template>
+                    </button>
+                </div>
+                <div class="text-[10px] font-bold uppercase tracking-widest text-teal-500 mb-3 opacity-50">Generated AI Prompt</div>
+                <div class="text-[11px] font-mono text-teal-100/80 leading-relaxed overflow-y-auto max-h-48 pr-2 custom-scrollbar">
+                    <pre class="whitespace-pre-wrap" x-text="getFinalPrompt()"></pre>
+                </div>
+            </div>
+
+            <button @click="copyPrompt()"
+                    :class="copied ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-teal-900 text-white shadow-teal-200'"
+                    class="w-full mt-6 py-5 rounded-2xl font-black text-lg shadow-xl transition-all flex items-center justify-center gap-3">
+                <span x-text="copied ? 'Success! Ready to Paste ✨' : 'One-Click Copy 📋'"></span>
+            </button>
+
+            <button @click="step = 1" class="mt-8 text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-teal-600 transition-colors">Start New Discovery</button>
+        </div>
+    </div>
+
+    <!-- Micro-copy Footer -->
+    <div class="mt-12 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-teal-800/30">
+        Personalized AI Prompt Generator • 2024
+    </div>
+</div>
+
+<script>
+    function dietApp() {
+        return {
+            step: 1,
+            progress: 25,
+            copied: false,
+            animals: [
+                { id: 'koala', name: 'The Koala', icon: '🐨' },
+                { id: 'walker', name: 'The Walker', icon: '🚶' },
+                { id: 'bee', name: 'The Bee', icon: '🐝' },
+                { id: 'cheetah', name: 'The Cheetah', icon: '🐆' }
+            ],
+            dietTypes: ['PURE VEG 🥬', 'EGGETARIAN 🥚', 'NON-VEG 🍗', 'VEGAN 🌱', 'RESTRICTED 🚫'],
+            data: {
+                age: '', sex: '', height: '', weight: '', role: '', medical: '',
+                energy: '', exerciseDays: '', workout: '', routine: '',
+                diet: '', fasting: '', meals: '', water: '', caffeine: '', supplements: '',
+                target: '', date: '', budget: '', loves: '', hates: '', cooking: '', motivation: 7, roadblocks: ''
+            },
+            next() {
+                if (this.step < 4) {
+                    this.step++;
+                    this.progress = (this.step / 4) * 100;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            },
+            prev() {
+                if (this.step > 1) {
+                    this.step--;
+                    this.progress = (this.step / 4) * 100;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            },
+            finish() {
+                this.step = 5;
+                this.progress = 100;
+                setTimeout(() => {
+                    const player = document.getElementById('confetti');
+                    if (player) player.play();
+                }, 100);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+            getFinalPrompt() {
+                return `**Role:** You are an expert Indian dietitian specializing in sustainable weight loss and Indian cuisines.
+
+**Mission:** Analyze my data and give me an honest Reality Check, a Simple Shift 7-day plan, and a Long Game strategy. Use sharp, fun language and "relatable math" (e.g., "1 extra spoon of oil = 120 calories").
+
+**User Data Summary:**
+- **Profile:** ${this.data.age}-year-old ${this.data.sex}, ${this.data.role}.
+- **Vitals:** ${this.data.height}cm | ${this.data.weight}kg.
+- **Medical/Safety:** ${this.data.medical || 'None specified'}.
+- **Daily Routine:** ${this.data.routine}.
+- **Activity:** Energy: ${this.data.energy.toUpperCase()} | Exercise: ${this.data.exerciseDays} (${this.data.workout}).
+- **Dietary Habits:** Style: ${this.data.diet} | Fasting: ${this.data.fasting}.
+- **Intake:** Meals: ${this.data.meals} | Water: ${this.data.water} glasses | Caffeine: ${this.data.caffeine} cups.
+- **Nutrients:** Supplements: ${this.data.supplements}.
+- **Kitchen & Budget:** Likes: ${this.data.loves} | Dislikes: ${this.data.hates} | Cooking: ${this.data.cooking} | Budget: ${this.data.budget}.
+- **Goals:** Target: ${this.data.target}. Motivation: ${this.data.motivation}/10. Roadblocks: ${this.data.roadblocks}.
+
+**Protocol: Follow these steps in order. DO NOT provide all steps at once.**
+
+Pre-condition - Check if you have all the information. You are allowed to ask 1-2 max questions if needed.
+**STEP 1: The Reality Check**
+1. Analyze the data: Tell me exactly what is working well and what is sabotaging my progress.
+2. Provide a **"Reality Check"** on my current lifestyle: Based on how I live now, what will actually happen to my weight and health in the next 6 months?
+3. Use "relatable math" to explain my habits.
+4. **End this response by asking me to say "Continue."**
+
+**STEP 2: The Simple Shift (Only after I say "Continue")**
+1. Provide a **7-Day Sample Plan**: Keep it simple. Do not overhaul my life; tweak my existing choices and schedule so it's easy to follow.
+2. Focus on **Habit Building**: Suggest small changes rather than massive restrictions.
+3. **Supplements:** Only recommend Magnesium, B12, Iron, Vitamin D, or Protein *if* my data indicates a need. No unnecessary products.
+4. **Safety:** List potential red flags or medical notes I should watch out for.
+5. **End this response by asking me to say "Continue."**
+
+**STEP 3: The Long Game (Only after I say "Continue")**
+1. Provide a **Feedback Loop**: Give me a simple mechanism or "metric" to monitor my progress weekly.
+2. **Follow-up Questions:** Ask 3-4 highly specific questions to help you refine this plan even further for me.
+3. End with a sharp, encouraging 2-week action plan.`;
+            },
+            copyPrompt() {
+                const text = this.getFinalPrompt();
+                navigator.clipboard.writeText(text).then(() => {
+                    this.copied = true;
+                    setTimeout(() => this.copied = false, 3000);
+                });
+            }
+        }
+    }
+</script>
+</body>
+</html>
